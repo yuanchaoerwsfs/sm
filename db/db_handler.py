@@ -11,7 +11,7 @@ from conf import settings
 def select_data(username, data=True, is_user=True):
     user_path = os.path.join(settings.USER_DATA_DIR, f'{username}.json')
     if not os.path.exists(user_path):
-        return
+        return  #return后面的代码就不执行了
     if not data:
         return True
     with open(user_path, mode='rt', encoding='utf-8') as f:
