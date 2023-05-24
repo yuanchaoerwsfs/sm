@@ -1,15 +1,10 @@
 # coding:utf-8
 # Author @sun
 """银行相关接口"""
-from db import db_handler
-from conf import settings
-from datetime import datetime
 
 from datetime import datetime
 from db import db_handler
 from conf import settings
-from lib import common
-
 
 # logger = common.get_logger('bank_logger')
 

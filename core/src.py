@@ -5,7 +5,6 @@
 from interface import user_interface, bank_interface, shop_interface
 from lib import common
 
-
 logged_user = None
 logged_admin = False
 
@@ -232,7 +231,8 @@ def login_out():
 # 11、管理员功能
 @common.login_auth
 def admin():
-    pass
+    from core import admin
+    admin.main()
 
 
 # 函数字典
@@ -256,7 +256,10 @@ def main():
     while True:
         print('欢迎访问购物管理系统'.center(20, '*'))
         for num in func_dic:
-            print(f'{num}:{func_dic[num][0]}')
+            if logged_admin:
+                print(f'{num}:{func_dic[num][0]}')
+            elif not num == '11':
+                print(f'{num}:{func_dic[num][0]}')
         num1 = input('请输入对应项目序号：').strip()
         if num1 not in func_dic:
             print('*' * 20)
