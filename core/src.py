@@ -85,46 +85,55 @@ def login():
 
 
 # 3、充值功能
+@common.login_auth
 def recharge():
     pass
 
 
 # 4、转账功能
+@common.login_auth
 def transfer():
     pass
 
 
 # 5、提现功能
+@common.login_auth
 def withdraw():
     pass
 
 
 # 6、查看余额
+@common.login_auth
 def check_balance():
     pass
 
 
 # 7、查看流水
+@common.login_auth
 def check_flow():
     pass
 
 
 # 8、购物功能
+@common.login_auth
 def shopping():
     pass
 
 
 # 9、查看购物车
+@common.login_auth
 def check_shopping_cart():
     pass
 
 
 # 10、退出账号
+@common.login_auth
 def login_out():
     pass
 
 
 # 11、管理员功能
+@common.login_auth
 def admin():
     pass
 
