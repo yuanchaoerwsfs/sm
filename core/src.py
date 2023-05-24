@@ -4,7 +4,7 @@
 
 import re
 
-from interface import user_interface
+from interface import user_interface, bank_interface
 from lib import common
 
 logged_user = None
@@ -37,7 +37,6 @@ def register(is_admin=False):
             print('\n两次输入的密码不一致！')
             continue
 
-        import re
         # 2.3、校验用户名是否合法
         if not re.findall('^[a-zA-Z]\w{2,9}$', username):
             print('\n用户名长度必须为3-10个字符！\n只能由字母、数字、下划线组成，并只能以字母开头！')
@@ -87,7 +86,20 @@ def login():
 # 3、充值功能
 @common.login_auth
 def recharge():
-    pass
+    while True:
+        print('\n充值功能')
+        amount = input('请输入充值金额：').strip()
+        is_recharge = input('按任意键确认/n退出：').strip().lower()
+        if is_recharge == 'n':
+            break
+        amount = int(amount)
+        if amount <= 0:
+            print('输入的充值金额应该大于0')
+            continue
+        flag, msg = bank_interface.recharge_interface(amount, logged_user)
+        print(msg)
+        if flag:
+            break
 
 
 # 4、转账功能
@@ -99,13 +111,32 @@ def transfer():
 # 5、提现功能
 @common.login_auth
 def withdraw():
-    pass
+    while True:
+        print('\n提现功能')
+        amount = input('请输入提现金额：').strip()
+        is_withdraw = input('按任意键确认/n退出：').strip().lower()
+        if is_withdraw == 'n':
+            break
+        amount = int(amount)
+        if amount < 0:
+            print('输入的充值金额应该大于0')
+            continue
+        flag, msg = bank_interface.recharge_interface(amount, logged_user)
+        print(msg)
+        if flag:
+            break
 
 
 # 6、查看余额
 @common.login_auth
 def check_balance():
-    pass
+    while True:
+        print('\n查询余额')
+        is_check_balance = input('按任意键确认/n退出：').strip().lower()
+        flag, msg = bank_interface.check_balance_interface(logged_user)
+        print(msg)
+        if flag:
+            break
 
 
 # 7、查看流水
