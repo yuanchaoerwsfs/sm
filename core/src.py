@@ -121,7 +121,7 @@ def withdraw():
         if amount < 0:
             print('输入的充值金额应该大于0')
             continue
-        flag, msg = bank_interface.recharge_interface(amount, logged_user)
+        flag, msg = bank_interface.withdraw_interface(amount, logged_user)
         print(msg)
         if flag:
             break
@@ -142,7 +142,13 @@ def check_balance():
 # 7、查看流水
 @common.login_auth
 def check_flow():
-    pass
+    print('\n查询余额')
+    flag, msg = bank_interface.check_flow_interface(logged_user)
+    if not flag:
+        print(f'当前{logged_user}流水为空！')
+    else:
+        for i in msg:
+            print(i)
 
 
 # 8、购物功能
