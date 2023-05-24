@@ -2,10 +2,9 @@
 # Author @sun
 """用户试图层"""
 
-import re
-
-from interface import user_interface, bank_interface
+from interface import user_interface, bank_interface, shop_interface
 from lib import common
+
 
 logged_user = None
 logged_admin = False
@@ -13,7 +12,7 @@ logged_admin = False
 
 # 0、退出
 def sign_out():
-    print('后会有期，退出成功！')
+    print('\n感谢使用，欢迎下次光临！')
     exit()
 
 
@@ -25,7 +24,7 @@ def register(is_admin=False):
         username = input('请输入用户名：').strip()
         password = input('请输入密码：').strip()
         re_password = input('请确认密码：').strip()
-        is_register = input('按任意键确认/"n"退出：').strip().lower()
+        is_register = input('按任意键确认/n退出：').strip().lower()
 
         # 2、进行简单的逻辑判断
         # 2.1、判断用户是否想要退出
@@ -37,15 +36,16 @@ def register(is_admin=False):
             print('\n两次输入的密码不一致！')
             continue
 
+        import re
         # 2.3、校验用户名是否合法
         if not re.findall('^[a-zA-Z]\w{2,9}$', username):
             print('\n用户名长度必须为3-10个字符！\n只能由字母、数字、下划线组成，并只能以字母开头！')
             continue
 
         # 2.4、校验密码强度
-        if not re.findall('^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,16}$', password):
-            print('\n密码太弱，必须包含大写字母、小写字母以及数字，并且长度必须为8-16位！')
-            continue
+        # if not re.findall('^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,16}$', password):
+        #     print('\n密码太弱，必须包含大写字母、小写字母以及数字，并且长度必须为8-16位！')
+        #     continue
 
         # 3、做密码加密
         password = common.pwd_to_sha256(password)
@@ -85,18 +85,34 @@ def login():
 
 # 3、充值功能
 @common.login_auth
-def recharge():
+def recharge(username=False):
     while True:
-        print('\n充值功能')
+        print('\n充值')
+        # 1、接收用户输入的充值金额
         amount = input('请输入充值金额：').strip()
         is_recharge = input('按任意键确认/n退出：').strip().lower()
+
+        # 2、判断用户是否想要退出
         if is_recharge == 'n':
             break
-        amount = int(amount)
-        if amount <= 0:
-            print('输入的充值金额应该大于0')
+
+        # 3、判断用户输入的是否是数字
+        if not amount.isdigit():
+            print('\n请输入正确的金额！')
             continue
-        flag, msg = bank_interface.recharge_interface(amount, logged_user)
+
+        # 4、把amount转成int类型
+        amount = int(amount)
+
+        # 5、判断用户输入的是否是0
+        if amount == 0:
+            print('\n充值的金额不能为0！')
+            continue
+
+        # 6、调用充值接口进行充值
+        if not username:
+            username = logged_user
+        flag, msg = bank_interface.recharge_interface(username, amount)
         print(msg)
         if flag:
             break
@@ -105,23 +121,72 @@ def recharge():
 # 4、转账功能
 @common.login_auth
 def transfer():
-    pass
+    while True:
+        print('\n转账')
+        # 1、接收用户输入的用户名和转账金额
+        to_username = input('请输入转账目标的用户名：').strip()
+        amount = input('请输入转账金额：').strip()
+        is_transfer = input('按任意键确认/n退出：').strip().lower()
+
+        # 2、判断用户是否想要退出
+        if is_transfer == 'n':
+            break
+
+        # 3、判断用户输入的是否是数字
+        if not amount.isdigit():
+            print('\n请输入正确的金额！')
+            continue
+
+        # 4、把amount转成int类型
+        amount = int(amount)
+
+        # 5、判断用户输入的是否是0
+        if amount == 0:
+            print('\n转账的金额不能为0！')
+            continue
+
+        # 6、判断用户是否在给自己转账
+        if logged_user == to_username:
+            print('\n不能给自己转账！')
+            continue
+
+        # 7、调用转账接口
+        flag, msg = bank_interface.transfer_interface(
+            logged_user, to_username, amount
+        )
+        print(msg)
+        if flag:
+            break
 
 
 # 5、提现功能
 @common.login_auth
 def withdraw():
     while True:
-        print('\n提现功能')
+        print('\n提现')
+        # 1、接收用户输入的提现金额
         amount = input('请输入提现金额：').strip()
         is_withdraw = input('按任意键确认/n退出：').strip().lower()
+
+        # 2、判断用户是否想要退出
         if is_withdraw == 'n':
             break
-        amount = int(amount)
-        if amount < 0:
-            print('输入的充值金额应该大于0')
+
+        # 3、判断用户输入的是否是数字
+        if not amount.isdigit():
+            print('\n请输入正确的金额！')
             continue
-        flag, msg = bank_interface.withdraw_interface(amount, logged_user)
+
+        # 4、把amount转成int类型
+        amount = int(amount)
+
+        # 5、判断用户输入的是否小于500
+        if amount < 500:
+            print('\n提现的金额不能低于500！')
+            continue
+
+        # 6、调用提现接口
+        flag, msg = bank_interface.withdraw_interface(logged_user, amount)
         print(msg)
         if flag:
             break
@@ -130,25 +195,20 @@ def withdraw():
 # 6、查看余额
 @common.login_auth
 def check_balance():
-    while True:
-        print('\n查询余额')
-        is_check_balance = input('按任意键确认/n退出：').strip().lower()
-        flag, msg = bank_interface.check_balance_interface(logged_user)
-        print(msg)
-        if flag:
-            break
+    print('\n查看余额')
+    flag, msg = bank_interface.check_balance_interface(logged_user)
+    print(msg)
 
 
 # 7、查看流水
 @common.login_auth
 def check_flow():
-    print('\n查询余额')
-    flag, msg = bank_interface.check_flow_interface(logged_user)
-    if not flag:
-        print(f'当前{logged_user}流水为空！')
-    else:
-        for i in msg:
-            print(i)
+    print('\n查看流水')
+    flag, flow_list = bank_interface.check_flow_interface(logged_user)
+    if not flow_list:
+        print('\n当前用户没有流水！')
+    for flow in flow_list:
+        print(flow)
 
 
 # 8、购物功能

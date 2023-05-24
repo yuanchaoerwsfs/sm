@@ -3,7 +3,6 @@
 """
 
 from db import db_handler
-from lib import common
 
 
 # logger = common.get_logger('user')
