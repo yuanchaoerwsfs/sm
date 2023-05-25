@@ -55,3 +55,6 @@ def login_interface(username, password):
     msg = f'用户：{username} 登录成功！'
     # logger.info(msg)
     return True, msg, user_data.get('is_admin')
+
+
+

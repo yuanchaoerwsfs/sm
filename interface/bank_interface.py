@@ -21,7 +21,7 @@ def recharge_interface(username, amount):
     user_data['balance'] += amount
 
     # 3、记录流水
-    msg = f'{datetime.now()} 用户：{username} 充值 {amount} 元，成功！' \
+    msg = f'{datetime.now().replace(microsecond=0)} 用户：{username} 充值 {amount} 元，成功！' \
           f'当前余额为：{user_data.get("balance")} 元。'
     user_data['flow'].append(msg)
 
@@ -46,7 +46,7 @@ def withdraw_interface(username, amount):
     user_data['balance'] -= (amount + service_fee)
 
     # 4、记录流水
-    msg = f'{datetime.now()} 用户：{username} 提现 {amount} 元，成功！' \
+    msg = f'{datetime.now().replace(microsecond=0)} 用户：{username} 提现 {amount} 元，成功！' \
           f'手续费为：{service_fee} 元。' \
           f'当前余额为：{user_data.get("balance")} 元。'
     user_data['flow'].append(msg)
@@ -83,11 +83,11 @@ def transfer_interface(username, to_username, amount):
     to_user_data['balance'] += amount
 
     # 5、记录流水
-    msg = f'{datetime.now()} 用户：{username} 给用户：{to_username} 转账：{amount} 元，成功！' \
+    msg = f'{datetime.now().replace(microsecond=0)} 用户：{username} 给用户：{to_username} 转账：{amount} 元，成功！' \
           f'当前余额为：{user_data.get("balance")} 元。'
     user_data['flow'].append(msg)
 
-    to_msg = f'{datetime.now()} 用户：{to_username} 收到用户：{username} 转账：{amount} 元，成功！' \
+    to_msg = f'{datetime.now().replace(microsecond=0)} 用户：{to_username} 收到用户：{username} 转账：{amount} 元，成功！' \
              f'当前余额为：{to_user_data.get("balance")} 元。'
     to_user_data['flow'].append(to_msg)
 
@@ -120,7 +120,7 @@ def pay_interface(username, total):
     user_data['balance'] -= total
 
     # 4、添加流水
-    msg = f'{datetime.now()} 用户：{username} 消费：{total} 元，' \
+    msg = f'{datetime.now().replace(microsecond=0)} 用户：{username} 消费：{total} 元，' \
           f'当前余额为：{user_data.get("balance")}'
     user_data['flow'].append(msg)
 

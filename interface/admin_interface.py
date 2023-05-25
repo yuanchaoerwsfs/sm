@@ -13,8 +13,10 @@ def lock_user_interface(username):
     if user_data.get('locked'):
         user_data['locked'] = False
         msg = f'用户{username}已解冻！'
+        db_handler.save(user_data)
         return True, msg
     else:
         user_data['locked'] = True
         msg = f'用户{username}已冻结！'
+        db_handler.save(user_data)
         return True, msg

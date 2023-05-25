@@ -114,7 +114,7 @@ def recharge(username=False):
         flag, msg = bank_interface.recharge_interface(username, amount)
         print(msg)
         if flag:
-            break
+            return True
 
 
 # 4、转账功能
@@ -269,3 +269,5 @@ def main():
         print('*' * 20)
         func_dic[num1][1]()
         print('*' * 20)
+
+

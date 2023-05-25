@@ -13,17 +13,19 @@ def add_user():
         is_add_user = input('缺人继续按任意键/n退出：').strip().lower()
         if is_add_user == 'n':
             break
-        if is_admin:
+        if is_admin != 'n' or is_admin != 'N':
             src.register(True)
+            break
         else:
             src.register()
+            break
 
 
 # 管理员冻结/解冻账户
 def lock_user():
     while True:
         lock_username = input('输入要冻结/解冻的账户').strip()
-        is_lock_user = input('缺人继续按任意键/n退出').strip().lower()
+        is_lock_user = input('确认继续按任意键/n退出:').strip().lower()
         if is_lock_user == 'n':
             break
         flag, msg = admin_interface.lock_user_interface(lock_username)
@@ -34,7 +36,14 @@ def lock_user():
 
 # 管理员给用户充值
 def recharge_to_user():
-    pass
+    while True:
+        username = input('请输入要充值的账户：').strip()
+        is_recharge_to_user = input('确认继续按任意键/n退出:').strip().lower()
+        if is_recharge_to_user == 'n':
+            break
+        if src.recharge(username):
+            break
+
 
 
 func_dic = {
@@ -53,6 +62,6 @@ def main():
         if num not in func_dic:
             print('无此功能序号，请重新输入！')
             continue
-        if num == 0:
+        if num == '0':
             break
         func_dic.get(num)[1]()
