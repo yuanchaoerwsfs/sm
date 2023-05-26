@@ -213,8 +213,16 @@ def check_flow():
 # 8、购物功能
 @common.login_auth
 def shopping():
-    pass
-
+    # 1、取商品菜单 进行循环展示
+    goods = shop_interface.check_goods_interface('goods')
+    if not goods:
+        print('goods菜单配置文件不存在，请确认！')
+        return
+    while True:
+        print(f'欢迎光临，购物管理商城！'.center(50, '*'))
+        for index, good in enumerate(goods):
+            print(f'{"序号":<15}{good.get("number"):<15}{good.get("name"):<15}{good.get("price")}')
+    #2、选择商品序号，添加到购物车
 
 # 9、查看购物车
 @common.login_auth
@@ -269,5 +277,3 @@ def main():
         print('*' * 20)
         func_dic[num1][1]()
         print('*' * 20)
-
-

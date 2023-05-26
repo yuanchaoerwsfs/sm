@@ -14,3 +14,7 @@ USER_DATA_DIR = config.get('path', 'USER_DATA_DIR')  # 读取路径中数据
 if not os.path.isdir(USER_DATA_DIR):
     USER_DATA_DIR = os.path.join(BASE_DIR, 'db', 'user_data')
 RATE = config.getfloat('bank', 'RATE')
+
+GOODS_DATA_DIR = config.get('path', 'USER_DATA_DIR')  # 读取路径中数据
+if not os.path.isdir(GOODS_DATA_DIR):
+    USER_DATA_DIR = os.path.join(BASE_DIR, 'db', 'Goods_data')
