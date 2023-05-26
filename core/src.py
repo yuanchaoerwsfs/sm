@@ -223,7 +223,7 @@ def shopping():
         for index, good in enumerate(goods):
             print(f'{"序号":<15}{good.get("number"):<15}{good.get("name"):<15}{good.get("price")}')
     #2、选择商品序号，添加到购物车
-
+    num=input('请输入商品序号：')
 # 9、查看购物车
 @common.login_auth
 def check_shopping_cart():
