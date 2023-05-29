@@ -37,7 +37,7 @@ def register(is_admin=False):
 
         import re
         # 2.3、校验用户名是否合法
-        if not re.findall('^[a-zA-Z]\w{2,9}$', username):
+        if not re.findall('^[a-zA-Z0-9_]{2,9}$', username):
             print('\n用户名长度必须为3-10个字符！\n只能由字母、数字、下划线组成，并只能以字母开头！')
             continue
 
@@ -68,6 +68,10 @@ def login():
         # 2、判断用户是否想要退出
         if is_login == 'n':
             break
+        global logged_user
+        if logged_user:
+            print(f'{username}为登录中。。。。')
+            break
 
         # 3、做密码加密
         password = common.pwd_to_sha256(password)
@@ -76,7 +80,7 @@ def login():
         flag, msg, is_admin = user_interface.login_interface(username, password)
         print(msg)
         if flag:
-            global logged_user, logged_admin
+            global logged_admin
             logged_user = username
             logged_admin = is_admin
             break
@@ -213,27 +217,131 @@ def check_flow():
 # 8、购物功能
 @common.login_auth
 def shopping():
-    # 1、取商品菜单 进行循环展示
+    # 初始化购物车
+    shopping_cart = {}
+    # {"韭菜":{"number": "F00001", "name": "韭菜", "price": 2.0, "商品数量": 2},}
+
+    # 1、调用接口层，获取商品数据
     goods = shop_interface.check_goods_interface('goods')
+
     if not goods:
-        print('goods菜单配置文件不存在，请确认！')
+        print('\n没有商品数据！')
         return
+
     while True:
-        print(f'欢迎光临，购物管理商城！'.center(50, '*'))
-        for index, good in enumerate(goods):
-            print(f'{"序号":<15}{good.get("number"):<15}{good.get("name"):<15}{good.get("price")}')
-    #2、选择商品序号，添加到购物车
-    num=input('请输入商品序号：')
+        print('欢迎来到铁牛商城'.center(50, '='))
+        print(f'{"序号":<10}{"商品编号":<10}{"商品名称":<10}{"商品价格":<10}')
+        for indx, good in enumerate(goods):
+            print(f'{indx + 1:<11}{good.get("number"):<14}{good.get("name"):<12}{good.get("price"):<10}')
+        print('24小时为您服务'.center(50, '='))
+
+        opt = input('请选择商品序号(y结算/n退出)：').strip()
+
+        # 如果opt等于n，调用添加购物车接口，把购物车数据写入文件
+        if opt == 'n':
+            if not shopping_cart:
+                break
+            flag, msg = shop_interface.add_shop_cart_interface(logged_user, shopping_cart)
+            print(msg)
+            if flag:
+                break
+
+        # 如果用户输入y，调用结算接口
+        if opt == 'y':
+            if not shopping_cart:
+                print('\n没有选择任何商品，无法结算！')
+                continue
+
+            flag, msg, total = shop_interface.close_account_interface(logged_user, shopping_cart)
+            print(msg)
+            if flag:
+                print('欢迎光临铁牛商城'.center(72, ' '))
+                print('=' * 72)
+                print(f'{"序号":<10}{"商品编号":<10}{"商品名称":<10}{"商品价格":<10}{"商品数量":<10}{"商品总价":<10}')
+                for indx, good in enumerate(shopping_cart.values()):
+                    print(
+                        f'{indx + 1:<15}{good.get("number"):<10}{good.get("name"):<12}{good.get("price"):<12}'
+                        f'{good.get("数量"):<12}{int(good.get("数量")) * float(good.get("price")):<10}')
+                print(f'总消费金额：{total}')
+                print('=' * 72)
+                print('谢谢惠顾，欢迎下次光临'.center(72, ' '))
+                print('请保管好您的小票'.center(72, ' '))
+            break
+
+        # 3、判断用户输入的是否是数字
+        if not opt.isdigit():
+            print('\n请输入正确的商品编号！')
+            continue
+
+        # 4、判断用户输入的序号是否存在
+        opt = int(opt) - 1
+        if opt not in list(range(len(goods))):
+            print('\n该商品不存在！')
+            continue
+
+        # 5、获取用户选择的商品信息
+        good_info = goods[opt]
+        name = good_info.get('name')
+        shopping_cart_data = shop_interface.check_shop_cart_interface(logged_user)
+        if shopping_cart_data:
+            shopping_cart = shopping_cart_data
+        # 6、把商品信息添加到用户的购物车
+        # 6.1、判断购物车是否存在相同的商品
+        if name not in shopping_cart:
+            good_info['数量'] = 1
+            shopping_cart[name] = good_info
+        else:
+            shopping_cart[name]['数量'] += 1
+
+        print('\n当前购物车数据：')
+        print(f'{"序号":<10}{"商品编号":<10}{"商品名称":<10}{"商品价格":<10}{"商品数量":<10}{"商品总价":<10}')
+        for indx, good in enumerate(shopping_cart.values()):
+            print(
+                f'{indx + 1:<11}{good.get("number"):<14}{good.get("name"):<12}{good.get("price"):<12}'
+                f'{good.get("数量"):<12}{int(good.get("数量")) * float(good.get("price")):<10}')
+
+        # 1) 让用户继续选择商品
+        # 2) 让用户选择结算
+        # 3) 用户不想结算，想退出购物功能，把用户的购物车数据写入到用户数据
+
+
 # 9、查看购物车
 @common.login_auth
 def check_shopping_cart():
-    pass
+    # 1、调用查看购物车接口
+    shop_cart_file = shop_interface.check_shop_cart_interface(logged_user)
+    if not shop_cart_file:
+        print('\n购物车空空如也！')
+        return
+
+    # 2、打印购物车数据s
+    print('\n当前购物车数据：')
+    print(f'{"序号":<10}{"商品编号":<10}{"商品名称":<10}{"商品价格":<10}{"商品数量":<10}{"商品总价":<10}')
+    for indx, good in enumerate(shop_cart_file.values()):
+        print(
+            f'{indx + 1:<11}{good.get("number"):<14}{good.get("name"):<12}{good.get("price"):<12}'
+            f'{good.get("数量"):<12}{int(good.get("数量")) * float(good.get("price")):<10}')
+
+    # 3、让用户选择购买或者退出
+    opt = input('y付款/n退出：').strip().lower()
+
+    # 4、如果用户输入y，就调用结算接口结算
+    if opt == 'y':
+        flag, msg, total = shop_interface.close_account_interface(logged_user, shop_cart_file)
+        print(msg)
+        if flag:
+            # 调用清空购物车接口
+            shop_interface.clear_shop_cart_interface(logged_user)
+        # 如果结算失败，自动退出查看购物车功能
 
 
 # 10、退出账号
 @common.login_auth
 def login_out():
-    pass
+    global logged_user, logged_admin
+    print(f'\n用户：{logged_user} 已退出！')
+    logged_user = None
+    logged_admin = False
 
 
 # 11、管理员功能
