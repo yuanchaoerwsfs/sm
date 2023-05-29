@@ -2,6 +2,8 @@
 # Author @sun
 """公共方法"""
 from core import src
+import logging.config
+from conf import settings
 
 
 # 登陆装饰器
@@ -23,3 +25,12 @@ def pwd_to_sha256(password):
     h1 = hashlib.sha512(password.encode('utf-8'))  # 这货只管机密 没有解密，同数据加密结果一样，拿结果对比就完了
     h1.update('全世界最帅的男人！'.encode('gbk'))
     return h1.hexdigest()
+
+
+def get_logger(logger_name):
+    # 1、加载日志配置字典
+    logging.config.dictConfig(settings.LOGGING_DIC)
+
+    # 2、获取logger
+    logger = logging.getLogger(logger_name)
+    return logger

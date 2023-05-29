@@ -3,9 +3,9 @@
 """
 
 from db import db_handler
+from lib import  common
 
-
-# logger = common.get_logger('user')
+logger = common.get_logger('user')
 
 
 # 注册接口
@@ -34,7 +34,7 @@ def register_interface(username, password, is_admin=False, balance=0):
     # 3、调用数据处理层，保存用户数据
     db_handler.save(user_data)
     msg = f'用户：{username} 注册成功！'
-    # logger.info(msg)
+    logger.info(msg)
     return True, msg
 
 
@@ -53,7 +53,7 @@ def login_interface(username, password):
     if user_data.get('locked'):
         return False, f'\n用户：{username} 已被冻结！', False
     msg = f'用户：{username} 登录成功！'
-    # logger.info(msg)
+    logger.info(msg)
     return True, msg, user_data.get('is_admin')
 
 

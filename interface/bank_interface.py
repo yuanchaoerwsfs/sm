@@ -5,8 +5,9 @@
 from datetime import datetime
 from db import db_handler
 from conf import settings
+from lib import common
 
-# logger = common.get_logger('bank_logger')
+logger = common.get_logger('bank_logger')
 
 
 # 充值接口
@@ -27,7 +28,7 @@ def recharge_interface(username, amount):
 
     # 4、调用数据处理层，保存修改之后的数据
     db_handler.save(user_data)
-    # logger.info(msg)
+    logger.info(msg)
     return True, msg
 
 
@@ -53,7 +54,7 @@ def withdraw_interface(username, amount):
 
     # 5、调用数据处理层，保存修改之后的数据
     db_handler.save(user_data)
-    # logger.info(msg)
+    logger.info(msg)
     return True, msg
 
 
@@ -94,7 +95,7 @@ def transfer_interface(username, to_username, amount):
     # 6、保存用户数据
     db_handler.save(user_data)
     db_handler.save(to_user_data)
-    # logger.info(msg)
+    logger.info(msg)
     return True, msg
 
 
@@ -113,7 +114,7 @@ def pay_interface(username, total):
     # 2、判断用户余额是否充足
     if user_data.get('balance') < total:
         msg = f'用户：{username} 余额不足，支付：{total} 元，失败！'
-        # logger.warning(msg)
+        logger.warning(msg)
         return False, msg
 
     # 3、支付
@@ -126,5 +127,5 @@ def pay_interface(username, total):
 
     # 5、保存用户数据
     db_handler.save(user_data)
-    # logger.info(msg)
+    logger.info(msg)
     return True, msg
