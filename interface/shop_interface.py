@@ -4,6 +4,7 @@
 
 from db import db_handler
 from interface import bank_interface
+from lib import common
 
 
 logger = common.get_logger('shopping')
